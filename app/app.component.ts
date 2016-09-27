@@ -1,19 +1,9 @@
 import { Component } from '@angular/core';
 import { Hero } from './types/hero';
+import { HeroService } from './services/hero.service';
 
+import { OnInit } from '@angular/core';
 
-const HEROES:Hero[] = [
-    {id: 11, name: 'Mr. Nice'},
-    {id: 12, name: 'Narco'},
-    {id: 13, name: 'Bombasto'},
-    {id: 14, name: 'Celeritas'},
-    {id: 15, name: 'Magneta'},
-    {id: 16, name: 'RubberMan'},
-    {id: 17, name: 'Dynama'},
-    {id: 18, name: 'Dr IQ'},
-    {id: 19, name: 'Magma'},
-    {id: 20, name: 'Tornado'}
-];
 
 @Component({
     selector: 'my-app',
@@ -81,11 +71,17 @@ const HEROES:Hero[] = [
     margin-right: .8em;
     border-radius: 4px 0 0 4px;
   }
-`]
+`],
+    providers: [HeroService]
 })
 
 
-export class AppComponent {
+export class AppComponent implements OnInit {
+
+    constructor(private heroService: HeroService) {
+        //this.heroes = this.heroService.getHeroes(); // THIS IS BAD to call such initialisation in the c'tor. Do it via Angular OnInit()
+    }
+
 
     // Not required now
     //hero:Hero = {
@@ -96,9 +92,23 @@ export class AppComponent {
     title = 'Tour of Hereos';
 
 
-    heroes = HEROES;
+    heroes: Hero[]; // heroes is an array of Hero's
 
     selectedHero: Hero;
+
+
+    // Angular will call this function because we specify that this class implements the OnInit() interface
+    ngOnInit(): void {
+        this.getHeroes();
+    }
+
+    // Separated routine to call the service (which could be mocked)
+    getHeroes(): void {
+        //this.heroes = this.heroService.getHeroes(); // old synchronous call
+
+        // now call via promise
+        this.heroService.getHeroes().then(heroes => this.heroes = heroes);
+    }
 
     // Select handler
     onSelect(hero: Hero): void {
